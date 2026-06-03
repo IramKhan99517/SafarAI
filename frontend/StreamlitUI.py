@@ -49,7 +49,8 @@ with col1:
         user_input = "how to perform tawaf"
 
     # ✅ process input
-    if send_clicked or mic_clicked:
+    if send_clicked or mic_clicked or user_input:
+
         if user_input:
             st.session_state.query = user_input
 
