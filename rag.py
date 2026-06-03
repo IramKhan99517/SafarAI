@@ -1,14 +1,19 @@
 import os
+from healthapi import get_heat_risk
 
-documents = []
+# ✅ Store documents
+documents = {
+    "health": [],
+    "sai": [],
+    "tawaf": []
+}
+
 
 # ✅ Load documents
 def load_documents():
     global documents
-    documents = []
 
     folder_path = os.path.join(os.path.dirname(__file__), "data")
-
     print("📁 Loading from:", folder_path)
 
     if not os.path.exists(folder_path):
@@ -20,37 +25,83 @@ def load_documents():
 
         if file.endswith(".txt"):
             with open(os.path.join(folder_path, file), "r", encoding="utf-8") as f:
-                documents.append(f.read().lower())
+                content = f.read()
 
-    print("✅ Total documents:", len(documents))
+                if "SAI_RITUAL" in content:
+                    documents["sai"].append(content)
+
+                elif "TAWAF_RITUAL" in content:
+                    documents["tawaf"].append(content)
+
+                else:
+                    documents["health"].append(content)
+
+    print("✅ Documents loaded:", {k: len(v) for k, v in documents.items()})
 
 
-# ✅ Retrieve context
-def retrieve_context(query):
-    query_words = query.lower().split()
-    results = []
+# ✅ Extract section
+def get_section(section_name, topic):
+    docs = documents.get(topic, [])
 
-    for doc in documents:
-        for line in doc.split("\n"):
+    for doc in docs:
+        lines = doc.split("\n")
+        capture = False
+        output = []
 
-            line_lower = line.lower()
-            score = 0
+        for line in lines:
+            if section_name.upper() in line:
+                capture = True
+                continue
 
-            for word in query_words:
-                if word in line_lower:
-                    score += 1
+            if capture and line.strip().endswith(":") and section_name.upper() not in line:
+                break
 
-            if score > 0 and len(line.strip()) > 10:
-                results.append((score, line.strip()))
+            if capture:
+                output.append(line)
 
-    # ✅ sort results
-    results.sort(reverse=True, key=lambda x: x[0])
+        if output:
+            return "\n".join(output).strip()
 
-    # ✅ format top results
-    top_lines = [line for score, line in results[:5]]
+    return "Section not found."
 
-    formatted = []
-    for i, line in enumerate(top_lines, start=1):
-        formatted.append(f"{i}. {line}")
 
-    return "\n".join(formatted)
+# ✅ MAIN AI ENGINE
+def ask_rag(query):
+    q = query.lower()
+
+    # ✅ HEALTH / HEAT
+    if any(word in q for word in ["heat", "temperature", "sun", "hot", "health"]):
+        data = get_heat_risk()
+
+        if data:
+            temp = data["temperature"]
+            risk = data["risk"]
+            alert = data["alert"]
+
+            section_map = {
+                "high": "HEALTH_HIGH",
+                "moderate": "HEALTH_MODERATE",
+                "low": "HEALTH_LOW"
+            }
+
+            general = get_section("HEALTH_GENERAL", "health")
+            actions = get_section(section_map[risk], "health")
+
+            return (
+                "🌞 Health Precautions:\n\n"
+                + general
+                + f"\n\n🌡 Temperature: {temp}°C"
+                + f"\n🚨 Heat Alert: {alert}"
+                + "\n\n📋 Recommended Actions:\n"
+                + actions
+            )
+
+    # ✅ SAI
+    if any(word in q for word in ["sai", "safa", "marwa"]):
+        return "🕋 Sa’i Ritual:\n\n" + get_section("SAI_RITUAL", "sai")
+
+    # ✅ TAWAF
+    if any(word in q for word in ["tawaf", "kaaba"]):
+        return "🕋 Tawaf Ritual:\n\n" + get_section("TAWAF_RITUAL", "tawaf")
+
+    return None  # ✅ important for agent fallback
