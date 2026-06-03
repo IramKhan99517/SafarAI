@@ -106,19 +106,68 @@ if st.session_state.response:
         st.warning("⚠️ Audio unavailable")
 
 # ================= INCIDENT ================= #
+# ================= INCIDENT ================= #
 with col2:
 
     st.subheader("🚨 Report Incident")
 
     incident_type = st.selectbox("Type", ["Medical", "Lost", "Crowd"])
+
+    priority = st.selectbox(
+        "Priority Level",
+        ["🔴 High", "🟠 Moderate", "🟢 Low"]
+    )
+
     incident_desc = st.text_area("Describe issue...", height=150)
 
     if st.button("✅ Submit"):
+
         if incident_desc.strip():
-            st.success("✅ Incident reported!")
+
+            # ✅ HIGH PRIORITY → FULL EMERGENCY FLOW
+            if "High" in priority:
+
+                st.error("🚨 HIGH PRIORITY INCIDENT")
+
+                st.markdown(f"""
+**Incident Type:** {incident_type}  
+**Status:** Emergency Triggered  
+""")
+
+                # ✅ simulated system actions
+                with st.spinner("📡 Notifying nearest emergency team..."):
+                    import time
+                    time.sleep(1.5)
+
+                st.success("✅ Nearby emergency response team notified")
+
+                st.info("🚑 Team dispatched to your location")
+                st.warning("⏱️ Estimated arrival: 5–10 minutes")
+
+            # ✅ MODERATE
+            elif "Moderate" in priority:
+
+                st.warning("⚠️ MODERATE PRIORITY INCIDENT")
+
+                st.markdown(f"""
+**Incident Type:** {incident_type}  
+**Status:** Logged & Monitoring  
+""")
+
+                st.info("📌 Support team is reviewing the situation")
+
+            # ✅ LOW
+            else:
+
+                st.success("✅ LOW PRIORITY INCIDENT")
+
+                st.markdown(f"""
+**Incident Type:** {incident_type}  
+**Status:** Recorded for follow-up  
+""")
+
         else:
             st.warning("⚠️ Please describe the issue")
-
 # ================= FOOTER ================= #
 st.markdown("---")
 st.markdown(
