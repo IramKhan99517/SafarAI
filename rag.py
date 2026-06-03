@@ -2,11 +2,11 @@ import os
 
 documents = []
 
+# ✅ Load documents
 def load_documents():
     global documents
     documents = []
 
-    # ✅ Correct path
     folder_path = os.path.join(os.path.dirname(__file__), "data")
 
     print("📁 Loading from:", folder_path)
@@ -22,18 +22,20 @@ def load_documents():
             with open(os.path.join(folder_path, file), "r", encoding="utf-8") as f:
                 documents.append(f.read().lower())
 
-    print("✅ Total documents loaded:", len(documents))
+    print("✅ Total documents:", len(documents))
 
 
+# ✅ Retrieve context
 def retrieve_context(query):
     query_words = query.lower().split()
     results = []
 
     for doc in documents:
         for line in doc.split("\n"):
-            line_lower = line.lower()
 
+            line_lower = line.lower()
             score = 0
+
             for word in query_words:
                 if word in line_lower:
                     score += 1
@@ -41,14 +43,14 @@ def retrieve_context(query):
             if score > 0 and len(line.strip()) > 10:
                 results.append((score, line.strip()))
 
+    # ✅ sort results
     results.sort(reverse=True, key=lambda x: x[0])
 
-   top_lines = [line for score, line in results[:5]]
+    # ✅ format top results
+    top_lines = [line for score, line in results[:5]]
 
-# ✅ Re-number properly
-formatted = []
-for i, line in enumerate(top_lines, start=1):
-    formatted.append(f"{i}. {line}")
+    formatted = []
+    for i, line in enumerate(top_lines, start=1):
+        formatted.append(f"{i}. {line}")
 
-return "\n".join(formatted)
-
+    return "\n".join(formatted)
