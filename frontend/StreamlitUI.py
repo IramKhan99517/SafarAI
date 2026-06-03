@@ -43,23 +43,24 @@ with col1:
 
         with send_col:
             send_clicked = st.form_submit_button("➡️")
-             # ✅ Suggestions
-st.markdown("#### 💡 Suggestions:")
+            
+# ✅ ✅ PUT SUGGESTIONS HERE (IMPORTANT)
+    st.markdown("#### 💡 Suggestions:")
 
-suggest_col1, suggest_col2, suggest_col3 = st.columns(3)
+    suggest_col1, suggest_col2, suggest_col3 = st.columns(3)
 
-with suggest_col1:
-    if st.button("🕋 Tawaf Guide"):
-        user_input = "how to perform tawaf"
+    with suggest_col1:
+        if st.button("🕋 Tawaf Guide"):
+            user_input = "how to perform tawaf"
 
-with suggest_col2:
-    if st.button("🌡️ Heat Safety"):
-        user_input = "heat exhaustion precautions"
+    with suggest_col2:
+        if st.button("🌡️ Heat Safety"):
+            user_input = "heat exhaustion precautions"
 
-with suggest_col3:
-    if st.button("🏥 Nearby Hospital"):
-        user_input = "hospital in makkah"
-        
+    with suggest_col3:
+        if st.button("🏥 Nearby Hospital"):
+            user_input = "hospital in makkah"
+
 
     # ✅ mic action
     if mic_clicked:
@@ -67,7 +68,6 @@ with suggest_col3:
 
     # ✅ process input
     if send_clicked or mic_clicked or user_input:
-
         if user_input:
             st.session_state.query = user_input
 
@@ -86,7 +86,7 @@ with suggest_col3:
 
         st.markdown("### 🤖 AI:")
         st.write(st.session_state.response)
-       
+        
 
 # ✅ after showing response
 if st.session_state.response:
