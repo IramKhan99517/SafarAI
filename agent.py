@@ -1,26 +1,32 @@
-from rag import retrieve_context
+from sopengine import read_file
 from healthapi import get_heat_risk
 from locationapi import find_place
-from rag import load_documents, retrieve_context
 
-load_documents() 
+def agent_flow(question):
+    q = question.lower()
 
-def agent_flow(query):
-    q = query.lower()
+    # ✅ Ritual SOP
+    if "tawaf" in q:
+        return read_file("Tawaf_rituals.txt")
 
-    # ✅ HEALTH
-    if "heat" in q or "health" in q:
-        return get_heat_risk()
+    elif "sai" in q:
+        return read_file("sai_rituals.txt")
 
-    # ✅ LOCATION
-    elif "hospital" in q or "police" in q or "hotel" in q:
-        return find_place(query)
+    # ✅ Health API + SOP ✅
+    elif "heat" in q or "temperature" in q or "weather" in q or "exhaustion" in q:
 
-    # ✅ RAG (rituals)
-    else:
-        context = retrieve_context(query)
+        api_response = get_heat_risk()
+        sop_response = read_file("health_precautions.txt")
 
-        if not context:
-            return "No relevant information found."
+        return f"""{api_response}
 
-        return context
+📘 General Health Guidance:
+{sop_response}
+"""
+
+    # ✅ Location API (NOW FIXED ✅)
+    elif "hospital" in q or "hotel" in q or "police" in q:
+        return find_place(question)
+
+    # ✅ fallback
+    return "❗ No relevant information found. Try asking about Tawaf, Sai, health, or hospitals."
