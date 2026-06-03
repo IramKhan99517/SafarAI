@@ -32,48 +32,68 @@ with col1:
 
     st.subheader("💬 Ask AI")
 
+    # ✅ FORM
     with st.form("chat_form", clear_on_submit=True):
 
-        input_col, mic_col, send_col = st.columns([18, 1, 1])
+        # ✅ Responsive input layout
+        if is_mobile:
+            input_col = st.container()
+            mic_col = st.container()
+            send_col = st.container()
+        else:
+            input_col, mic_col, send_col = st.columns([8, 1, 1])
 
+        # ✅ Input
         with input_col:
             user_input = st.text_input(
-        "User Input",
-        placeholder="Ask your question...",
-        label_visibility="collapsed"
-    )
+                "User Input",
+                placeholder="Ask your question...",
+                label_visibility="collapsed"
+            )
 
-            
-
-        with mic_col:
+        # ✅ Buttons
+        if is_mobile:
             mic_clicked = st.form_submit_button("🎤")
-
-        with send_col:
             send_clicked = st.form_submit_button("➡️")
-            
-# ✅ ✅ PUT SUGGESTIONS HERE (IMPORTANT)
+        else:
+            with mic_col:
+                mic_clicked = st.form_submit_button("🎤")
+
+            with send_col:
+                send_clicked = st.form_submit_button("➡️")
+
+    # ✅ Suggestions (correct placement)
     st.markdown("#### 💡 Suggestions:")
 
-    suggest_col1, suggest_col2, suggest_col3 = st.columns(3)
-
-    with suggest_col1:
+    if is_mobile:
         if st.button("🕋 Tawaf Guide"):
             user_input = "how to perform tawaf"
 
-    with suggest_col2:
         if st.button("🌡️ Heat Safety"):
             user_input = "heat exhaustion precautions"
 
-    with suggest_col3:
         if st.button("🏥 Nearby Hospital"):
             user_input = "hospital in makkah"
+    else:
+        s1, s2, s3 = st.columns(3)
 
+        with s1:
+            if st.button("🕋 Tawaf Guide"):
+                user_input = "how to perform tawaf"
 
-    # ✅ mic action
+        with s2:
+            if st.button("🌡️ Heat Safety"):
+                user_input = "heat exhaustion precautions"
+
+        with s3:
+            if st.button("🏥 Nearby Hospital"):
+                user_input = "hospital in makkah"
+
+    # ✅ Mic shortcut
     if mic_clicked:
         user_input = "how to perform tawaf"
 
-    # ✅ process input
+    # ✅ Process input
     if send_clicked or mic_clicked or user_input:
         if user_input:
             st.session_state.query = user_input
@@ -86,31 +106,15 @@ with col1:
 
             st.session_state.response = response
 
-    # ✅ display
+    # ✅ Display response
     if st.session_state.query:
+        st.markdown("---")
+
         st.markdown("### 🧑 You:")
         st.write(st.session_state.query)
 
         st.markdown("### 🤖 AI:")
         st.write(st.session_state.response)
-        
-
-# ✅ after showing response
-if st.session_state.response:
-    try:
-        tts = gTTS(text=st.session_state.response)
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-            tts.save(fp.name)
-
-        # ✅ Create tighter centered layout
-        spacer1, content, spacer2 = st.columns([1, 2, 3])
-
-        with content:
-            st.audio(fp.name, format="audio/mp3")
-
-    except:
-        st.warning("⚠️ Audio unavailable")
 
 # ================= INCIDENT ================= #
 with col2:
@@ -118,7 +122,11 @@ with col2:
     st.subheader("🚨 Report Incident")
 
     incident_type = st.selectbox("Type", ["Medical", "Lost", "Crowd"])
-    incident_desc = st.text_area("Describe issue...", height=150)
+
+    incident_desc = st.text_area(
+        "Describe issue...",
+        height=150
+    )
 
     if st.button("✅ Submit"):
         if incident_desc.strip():
@@ -132,4 +140,3 @@ st.markdown(
     "<center style='color:gray;'>✨ Curated by Iram Majeed Khan ✨</center>",
     unsafe_allow_html=True
 )
-
