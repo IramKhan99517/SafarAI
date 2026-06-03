@@ -9,38 +9,42 @@ def get_heat_risk():
 
         temp = data["current_weather"]["temperature"]
 
-        # ✅ Risk levels
+        # ✅ HIGH RISK
         if temp >= 45:
-            alert = "🔴 High Risk"
-            actions = [
-                "Avoid sunlight immediately",
-                "Drink water continuously",
-                "Rest in shaded area",
-                "Seek medical help"
-            ]
+            return f"""🌡️ Temperature: {temp}°C  
+🔴 HIGH RISK (Heat Exhaustion)
 
+🚨 Immediate Actions:
+1. Avoid going outside
+2. Stay in air-conditioned areas
+3. Drink water continuously
+4. Use umbrella and cooling cloth
+5. Seek medical help if dizziness occurs
+"""
+
+        # ✅ MODERATE RISK
         elif temp >= 38:
-            alert = "🟡 Moderate Risk"
-            actions = [
-                "Limit sun exposure",
-                "Drink water frequently",
-                "Wear light clothes",
-                "Take rest breaks"
-            ]
+            return f"""🌡️ Temperature: {temp}°C  
+🟡 MODERATE RISK
 
+⚠️ Precautions:
+1. Drink water frequently
+2. Avoid peak afternoon heat
+3. Wear light and loose clothing
+4. Take rest in shaded areas
+"""
+
+        # ✅ LOW / GENERAL
         else:
-            alert = "🟢 Low Risk"
-            actions = [
-                "Stay hydrated",
-                "Wear comfortable clothes",
-                "Avoid long exposure"
-            ]
+            return f"""🌡️ Temperature: {temp}°C  
+🟢 LOW RISK
 
-        return (
-            f"🌡 Temperature: {temp}°C\n"
-            f"🚨 Heat Alert: {alert}\n\n"
-            + "\n".join(actions)
-        )
+✅ General Advice:
+1. Stay hydrated
+2. Follow normal safety measures
+3. Keep water bottle with you
+"""
 
-    except:
-        return "Health data unavailable"
+    except Exception as e:
+        print("❌ Error:", e)
+        return "⚠️ Unable to fetch live weather data"
