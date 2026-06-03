@@ -43,4 +43,12 @@ def retrieve_context(query):
 
     results.sort(reverse=True, key=lambda x: x[0])
 
-    return "\n".join([line for score, line in results[:5]])
+   top_lines = [line for score, line in results[:5]]
+
+# ✅ Re-number properly
+formatted = []
+for i, line in enumerate(top_lines, start=1):
+    formatted.append(f"{i}. {line}")
+
+return "\n".join(formatted)
+
